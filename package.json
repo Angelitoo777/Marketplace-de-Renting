@@ -1,0 +1,38 @@
+{
+  "name": "marketplace-de-renting",
+  "version": "1.0.0",
+  "description": "Backend robusto para reservas de productos o propiedades, con roles, cache optimizado, mensajería, pagos simulados, testing y documentación.",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Angelitoo777/Marketplace-de-Renting.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Angelitoo777/Marketplace-de-Renting/issues"
+  },
+  "homepage": "https://github.com/Angelitoo777/Marketplace-de-Renting#readme",
+  "dependencies": {
+    "bcrypt": "6.0.0",
+    "cookie-parser": "1.4.7",
+    "dotenv": "17.2.3",
+    "express": "5.1.0",
+    "jsonwebtoken": "9.0.2",
+    "mysql2": "3.15.2",
+    "sequelize": "6.37.7",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "standard": "^17.1.2"
+  },
+  "eslintConfig": {
+    "extends": "standard"
+  }
+}
