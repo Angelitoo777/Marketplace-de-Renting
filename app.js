@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { routesOfAuth } from './routes/auth.routes.js'
 import { routesOfAdmin } from './routes/admin.routes.js'
 import { routesOfProfile } from './routes/profile.routes.js'
+import { routesOfProducts } from './routes/products.routes.js'
 import cookieParser from 'cookie-parser'
 
 dotenv.config()
@@ -23,6 +24,7 @@ try {
 app.use('/auth', routesOfAuth)
 app.use('/api', routesOfAdmin)
 app.use('/api', routesOfProfile)
+app.use('/api', routesOfProducts)
 
 app.get('/', (req, res) => {
   res.send('Hello world')
