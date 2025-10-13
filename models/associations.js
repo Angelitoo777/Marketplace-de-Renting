@@ -1,4 +1,5 @@
 import { User, Roles } from './user.model.js'
+import { Products } from './products.model.js'
 
 User.belongsToMany(Roles, {
   through: 'user_roles',
@@ -14,4 +15,14 @@ Roles.belongsToMany(User, {
   as: 'user'
 })
 
-export { User, Roles }
+User.hasMany(Products, {
+  foreignKey: 'owner_id',
+  as: 'products'
+})
+
+Products.belongsTo(User, {
+  foreignKey: 'owner_id',
+  as: 'owner'
+})
+
+export { User, Roles, Products }
