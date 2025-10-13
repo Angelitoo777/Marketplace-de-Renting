@@ -8,10 +8,11 @@ dotenv.config()
 
 const JWT_SECRET = process.env.JWT_SECRET
 
-export class UserController {
-  static async getUser (req, res) {
+export class AuthController {
+  static async getMe (req, res) {
+    const { id } = req.user
     try {
-      const users = await User.findAll({
+      const users = await User.findByPk(id, {
         include: [{
           model: Roles,
           as: 'roles',
@@ -99,7 +100,8 @@ export class UserController {
         .cookie('access_token', token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          maxAge: 3600000 // 1 hr
+          maxAge: 3600000, // 1 hr
+          sameSite: 'Strict'
         })
         .status(200)
         .json({ message: 'Te has logueado exitosamente' })
@@ -107,5 +109,21 @@ export class UserController {
       console.error('error:', error.message)
       return res.status(500).json({ message: 'Error interno del servidor' })
     }
+  }
+
+  static async logout (req, res) {
+    const refreshToken = req.cookies.access_token
+
+    if (!refreshToken) {
+      return res.status(204).json({ message: 'No hay sesión activa.' })
+    }
+
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict'
+    })
+
+    return res.status(200).json({ message: 'Sesión cerrada exitosamente.' })
   }
 }

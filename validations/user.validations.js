@@ -9,10 +9,22 @@ const validationUser = z.object({
   )
 })
 
+const rolValidate = z.object({
+  roles: z.number().int().positive().min(1).optional().default([1])
+})
+
 export const validateUser = (data) => {
   return validationUser.safeParse(data)
 }
 
 export const validateLogin = (data) => {
   return validationUser.partial().safeParse(data)
+}
+
+export const validatePartialUser = (data) => {
+  return validationUser.partial().safeParse(data)
+}
+
+export const validateRol = (data) => {
+  return rolValidate.safeParse(data)
 }
