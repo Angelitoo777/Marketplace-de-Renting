@@ -1,7 +1,9 @@
 import express from 'express'
 import { sequelize } from './databases/mysql.database.js'
 import dotenv from 'dotenv'
-import { routesOfUser } from './routes/user.routes.js'
+import { routesOfAuth } from './routes/auth.routes.js'
+import { routesOfAdmin } from './routes/admin.routes.js'
+import { routesOfProfile } from './routes/profile.routes.js'
 import cookieParser from 'cookie-parser'
 
 dotenv.config()
@@ -18,7 +20,9 @@ try {
   console.error(error)
 }
 
-app.use('/auth', routesOfUser)
+app.use('/auth', routesOfAuth)
+app.use('/api', routesOfAdmin)
+app.use('/api', routesOfProfile)
 
 app.get('/', (req, res) => {
   res.send('Hello world')
