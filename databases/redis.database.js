@@ -1,20 +1,12 @@
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import dotenv from 'dotenv'
 dotenv.config()
 
-const REDIS_HOST = process.env.REDIS_HOST
-const REDIS_PORT = process.env.REDIS_PORT
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'
 
-export const redisDB = async () => {
-  try {
-    const redisClient = new Redis({
-      host: REDIS_HOST || 'localhost',
-      port: REDIS_PORT || 6379
-    })
-    console.log('Conexión a Redis establecida correctamente y lista para usarse.')
+export const redisClient = new Redis(REDIS_URL, {
+  maxRetriesPerRequest: null
+})
 
-    return redisClient
-  } catch (error) {
-    console.error('Error de conexión a Redis:', error.message)
-  }
-}
+redisClient.on('connect', () => console.log('Redis conectado'))
+redisClient.on('error', (err) => console.error('Redis Error:', err))

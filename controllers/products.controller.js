@@ -1,8 +1,6 @@
 import { Products, User } from '../models/associations.js'
 import { validationProduct, validationPartialProduct } from '../validations/products.validations.js'
-import { redisDB } from '../databases/redis.database.js'
-
-const redisClient = await redisDB()
+import { redisClient } from '../databases/redis.database.js'
 
 export class ProductsController {
   static async getAll (req, res) {
@@ -75,7 +73,7 @@ export class ProductsController {
     try {
       const newProduct = await Products.create(productData)
 
-      await redisClient.del('products:all')
+      await redisClient.del('products:all', `products:${id}`)
 
       return res.status(201).json({ message: 'Producto creado exitosamente.', newProduct })
     } catch (error) {
@@ -103,7 +101,7 @@ export class ProductsController {
 
       const updatedProductInstance = await Products.findByPk(id)
 
-      await redisClient.del('products:all')
+      await redisClient.del('products:all', `products:${id}`)
 
       return res.status(200).json({ message: 'Producto actualizado exitosamente.', updatedProductInstance })
     } catch (error) {
@@ -116,11 +114,15 @@ export class ProductsController {
     const { id } = req.params
 
     try {
-      await Products.destroy({ where: { id } })
+      const [deletedProduct] = await Products.destroy({ where: { id } })
 
-      await redisClient.del('products:all')
+      if (deletedProduct === 0) {
+        return res.status(404).json({ message: 'Producto no encontrado.' })
+      }
 
-      return res.status(200).json({ message: 'Producto eliminado exitosamente.' })
+      await redisClient.del('products:all', `products:${id}`)
+
+      return res.status(204).send()
     } catch (error) {
       console.error('error:', error.message)
       return res.status(500).json({ message: 'Error interno del servidor' })
