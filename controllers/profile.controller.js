@@ -8,6 +8,7 @@ export class ProfileController {
     const { id } = req.user
     try {
       const users = await User.findByPk(id, {
+        attributes: { exclude: ['password'] },
         include: [{
           model: Roles,
           as: 'roles',
@@ -51,7 +52,7 @@ export class ProfileController {
         return res.status(404).json({ message: 'No se pudieron realizar los cambios.' })
       }
 
-      const updatedUserInstance = await User.findByPk(id)
+      const updatedUserInstance = await User.findByPk(id, { attributes: { exclude: ['password'] } })
 
       return res.status(200).json({ message: 'Usuario actualizado correctamente', user: { username: updatedUserInstance.username, email: updatedUserInstance.email } })
     } catch (error) {

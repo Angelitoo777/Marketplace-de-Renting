@@ -7,6 +7,7 @@ export class AdminController {
   static async getUser (req, res) {
     try {
       const users = await User.findAll({
+        attributes: { exclude: ['password'] },
         include: [{
           model: Roles,
           as: 'roles',
@@ -26,6 +27,7 @@ export class AdminController {
     const { id } = req.params
     try {
       const user = await User.findByPk(id, {
+        attributes: { exclude: ['password'] },
         include: [{
           model: Roles,
           as: 'roles',
@@ -75,7 +77,7 @@ export class AdminController {
         return res.status(404).json({ message: 'Usuario no encontrado o no se realizaron cambios.' })
       }
 
-      const updatedUserInstance = await User.findByPk(id)
+      const updatedUserInstance = await User.findByPk(id, { attributes: { exclude: ['password'] } })
 
       return res.status(200).json({ message: 'Usuario actualizado correctamente', user: { username: updatedUserInstance.username, email: updatedUserInstance.email } })
     } catch (error) {
@@ -95,7 +97,7 @@ export class AdminController {
     const { roles } = validation.data
 
     try {
-      const findUser = await User.findByPk(id)
+      const findUser = await User.findByPk(id, { attributes: { exclude: ['password'] } })
 
       if (!findUser) {
         return res.status(404).json({ message: 'Usuario no encontrado' })
@@ -124,7 +126,7 @@ export class AdminController {
   static async deleteUser (req, res) {
     const { id } = req.params
     try {
-      const userExisting = await User.findByPk(id)
+      const userExisting = await User.findByPk(id, { attributes: { exclude: ['password'] } })
 
       if (!userExisting) {
         return res.status(400).json({ message: 'Usuario no existente' })

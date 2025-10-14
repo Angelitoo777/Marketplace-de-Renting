@@ -5,6 +5,7 @@ import { routesOfAuth } from './routes/auth.routes.js'
 import { routesOfAdmin } from './routes/admin.routes.js'
 import { routesOfProfile } from './routes/profile.routes.js'
 import { routesOfProducts } from './routes/products.routes.js'
+import { redisClient } from './databases/redis.database.js'
 import cookieParser from 'cookie-parser'
 
 dotenv.config()

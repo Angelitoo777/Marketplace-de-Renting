@@ -69,6 +69,7 @@ export class AuthController {
     try {
       const user = await User.findOne({
         where: { username },
+        attributes: { exclude: ['password'] },
         include: [{
           model: Roles,
           as: 'roles',
