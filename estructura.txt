@@ -1,0 +1,33 @@
+.
+├── app.js
+├── controllers
+│   ├── admin.controller.js
+│   ├── auth.controller.js
+│   ├── products.controller.js
+│   └── profile.controller.js
+├── databases
+│   ├── mysql.database.js
+│   └── redis.database.js
+├── estructura.txt
+├── middlewares
+│   ├── auth.middleware.js
+│   ├── isOwner.middleware.js
+│   └── roles.middleware.js
+├── models
+│   ├── associations.js
+│   ├── products.model.js
+│   └── user.model.js
+├── package.json
+├── package-lock.json
+├── README.md
+├── routes
+│   ├── admin.routes.js
+│   ├── auth.routes.js
+│   ├── products.routes.js
+│   └── profile.routes.js
+├── services
+└── validations
+    ├── products.validations.js
+    └── user.validations.js
+
+8 directories, 23 files
