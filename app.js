@@ -5,12 +5,17 @@ import { routesOfAuth } from './routes/auth.routes.js'
 import { routesOfAdmin } from './routes/admin.routes.js'
 import { routesOfProfile } from './routes/profile.routes.js'
 import { routesOfProducts } from './routes/products.routes.js'
+import { routerOfRental } from './routes/rental.routes.js'
 import { redisClient } from './databases/redis.database.js'
+import swaggerUi from 'swagger-ui-express';
+import swaggerFile from './swagger-output.json' assert { type: 'json' };
 import cookieParser from 'cookie-parser'
 
 dotenv.config()
 
 const app = express()
+
+
 const PORT = process.env.PORT ?? 3000
 
 app.use(express.json())
@@ -26,6 +31,9 @@ app.use('/auth', routesOfAuth)
 app.use('/api', routesOfAdmin)
 app.use('/api', routesOfProfile)
 app.use('/api', routesOfProducts)
+app.use('/api', routerOfRental)
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.get('/', (req, res) => {
   res.send('Hello world')
