@@ -69,7 +69,7 @@ export class AuthController {
     try {
       const user = await User.findOne({
         where: { username },
-        attributes: { exclude: ['password'] },
+
         include: [{
           model: Roles,
           as: 'roles',
@@ -108,6 +108,7 @@ export class AuthController {
         .json({ message: 'Te has logueado exitosamente' })
     } catch (error) {
       console.error('error:', error.message)
+      console.error(error)
       return res.status(500).json({ message: 'Error interno del servidor' })
     }
   }
