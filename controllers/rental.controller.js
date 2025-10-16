@@ -1,3 +1,5 @@
+import { checkOverlapRenting } from '../middlewares/overlapRenting.middleware.js'
+import { createPaymentIntent } from '../services/stripe.services.js'
 import { Rental, RentalStatus, User, Products } from '../models/associations.js'
 import { validationRental, validationRentalStatus } from '../validations/rental.validations.js'
 import { redisClient } from '../databases/redis.database.js'
@@ -88,7 +90,7 @@ export class RentalController {
   }
 
   static async createRental (req, res) {
-    const { id } = req.user
+    const renter_id = req.user.id
     const validation = validationRental(req.body)
 
     if (!validation.success) {
@@ -104,9 +106,9 @@ export class RentalController {
         return res.status(404).json({ message: 'Producto no encontrado' })
       }
 
-      if (!findProduct.available) {
-        return res.status(400).json({ message: 'Producto no disponible para renta' })
-      }
+      // if (!findProduct.available) {
+      //   return res.status(400).json({ message: 'Producto no disponible para renta' })
+      // }
 
       const dateStart = new Date(startDate)
       const dateEnd = new Date(endDate)
@@ -124,8 +126,14 @@ export class RentalController {
         return res.status(500).json({ message: 'Estado de renta "Pendiente" no configurado' })
       }
 
+      const overlap = await checkOverlapRenting(product_id, startDate, endDate) // debido a que se agrego esta funcion, se documento la anterior validacion de rentas disponibles
+
+      if (overlap) {
+        return res.status(400).json({ message: 'El producto ya tiene una renta pendiente en las fechas seleccionadas' })
+      }
+
       const newRental = await Rental.create({
-        renter_id: id,
+        renter_id,
         product_id,
         startDate,
         endDate,
@@ -133,15 +141,22 @@ export class RentalController {
         status_id: rentalStatus.id
       })
 
-      await findProduct.update({ available: false })
+      const rental_id = newRental.id
+
+      const paymentIntent = await createPaymentIntent(totalPrice, rental_id, product_id, renter_id)
+
+      // await findProduct.update({ available: false }) documentamos ya que esta accion la haremos con el webhook de stripe
+
+      await newRental.update({ payment_intent_id: paymentIntent.id })
 
       await redisClient.del('rentals:all')
-      await redisClient.del(`rental:${id}`)
+      await redisClient.del(`rental:${newRental.id}`)
       await redisClient.del(`rentals:my:${newRental.renter_id}`)
 
       return res.status(201).json({
-        message: 'Renta creada exitosamente',
-        rental: newRental
+        message: 'Renta creada exitosamente, procede al pago.',
+        rental: newRental,
+        clientSecret: paymentIntent.client_secret
       })
     } catch (error) {
       console.error('error:', error.message)
@@ -172,7 +187,7 @@ export class RentalController {
       await rental.update({ status_id: status.id })
 
       await redisClient.del('rentals:all')
-      await redisClient.del(`rental:${id}`)
+      await redisClient.del(`rental:${rental.id}`)
       await redisClient.del(`rentals:my:${rental.renter_id}`)
 
       return res.status(200).json({ message: 'Estado de renta actualizado exitosamente' })
@@ -209,8 +224,8 @@ export class RentalController {
       }
 
       await redisClient.del('rentals:all')
-      await redisClient.del(`rental:${id}`)
-      await redisClient.del(`rentals:my:${renterId}`)
+      await redisClient.del(`rental:${rental.id}`)
+      await redisClient.del(`rentals:my:${rental.renter_id}`)
 
       return res.status(200).json({ message: 'Renta eliminada exitosamente' })
     } catch (error) {
