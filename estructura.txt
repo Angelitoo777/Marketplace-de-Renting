@@ -4,7 +4,9 @@
 │   ├── admin.controller.js
 │   ├── auth.controller.js
 │   ├── products.controller.js
-│   └── profile.controller.js
+│   ├── profile.controller.js
+│   ├── rental.controller.js
+│   └── stripe.controller.js
 ├── databases
 │   ├── mysql.database.js
 │   └── redis.database.js
@@ -12,10 +14,12 @@
 ├── middlewares
 │   ├── auth.middleware.js
 │   ├── isOwner.middleware.js
+│   ├── overlapRenting.middleware.js
 │   └── roles.middleware.js
 ├── models
 │   ├── associations.js
 │   ├── products.model.js
+│   ├── rental.model.js
 │   └── user.model.js
 ├── package.json
 ├── package-lock.json
@@ -24,10 +28,18 @@
 │   ├── admin.routes.js
 │   ├── auth.routes.js
 │   ├── products.routes.js
-│   └── profile.routes.js
+│   ├── profile.routes.js
+│   ├── rental.routes.js
+│   └── stripe.routes.js
 ├── services
-└── validations
-    ├── products.validations.js
-    └── user.validations.js
+│   └── stripe.services.js
+├── swagger.js
+├── swagger-output.json
+├── validations
+│   ├── products.validations.js
+│   ├── rental.validations.js
+│   └── user.validations.js
+└── views
+    └── test-payment.ejs
 
-8 directories, 23 files
+9 directories, 34 files

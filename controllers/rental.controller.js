@@ -1,6 +1,7 @@
+import { checkOverlapRenting } from '../middlewares/overlapRenting.middleware.js'
+import { createPaymentIntent } from '../services/stripe.services.js'
 import { Rental, RentalStatus, User, Products } from '../models/associations.js'
 import { validationRental, validationRentalStatus } from '../validations/rental.validations.js'
-import { checkOverlapRenting } from '../middlewares/overlapRenting.middleware.js'
 import { redisClient } from '../databases/redis.database.js'
 
 export class RentalController {
@@ -89,7 +90,7 @@ export class RentalController {
   }
 
   static async createRental (req, res) {
-    const { id } = req.user
+    const renter_id = req.user.id
     const validation = validationRental(req.body)
 
     if (!validation.success) {
@@ -132,7 +133,7 @@ export class RentalController {
       }
 
       const newRental = await Rental.create({
-        renter_id: id,
+        renter_id,
         product_id,
         startDate,
         endDate,
@@ -140,15 +141,22 @@ export class RentalController {
         status_id: rentalStatus.id
       })
 
-      await findProduct.update({ available: false })
+      const rental_id = newRental.id
+
+      const paymentIntent = await createPaymentIntent(totalPrice, rental_id, product_id, renter_id)
+
+      // await findProduct.update({ available: false }) documentamos ya que esta accion la haremos con el webhook de stripe
+
+      await newRental.update({ payment_intent_id: paymentIntent.id })
 
       await redisClient.del('rentals:all')
       await redisClient.del(`rental:${newRental.id}`)
       await redisClient.del(`rentals:my:${newRental.renter_id}`)
 
       return res.status(201).json({
-        message: 'Renta creada exitosamente',
-        rental: newRental
+        message: 'Renta creada exitosamente, procede al pago.',
+        rental: newRental,
+        clientSecret: paymentIntent.client_secret
       })
     } catch (error) {
       console.error('error:', error.message)

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Pago Directo</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        #client-secret-form,
+        #payment-form {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        #payment-element {
+            margin-bottom: 20px;
+        }
+
+        #messages {
+            color: red;
+        }
+
+        input[type="text"] {
+            width: 95%;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Paso 1: Pegar el Client Secret</h1>
+    <form id="client-secret-form">
+        <label for="client-secret">Pega el client_secret obtenido de Postman:</label><br>
+        <input type="text" id="client-secret" name="client-secret" required><br><br>
+        <button type="submit">Cargar Panel de Pago</button>
+    </form>
+
+    <hr>
+
+    <h2>Paso 2: Realizar el Pago</h2>
+    <form id="payment-form" style="display:none;">
+        <div id="payment-element">
+        </div>
+        <button id="submit-payment">Pagar Ahora</button>
+        <div id="messages" role="alert"></div>
+    </form>
+
+    <script>
+        import dotenv from 'dotenv';
+        dotenv.config();
+
+        const STRIPE_PUBLIC_KEY = '<%= process.env.STRIPE_PUBLIC_KEY %>';
+
+        const stripe = Stripe(STRIPE_PUBLIC_KEY);
+
+        const clientSecretForm = document.getElementById('client-secret-form');
+        const paymentForm = document.getElementById('payment-form');
+        const messages = document.getElementById('messages');
+
+        let elements;
+
+        // 1. Escuchamos el envío del formulario con el client_secret
+        clientSecretForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clientSecret = document.getElementById('client-secret').value;
+
+            if (!clientSecret) {
+                alert('Por favor, pega un client_secret.');
+                return;
+            }
+
+            // 2. Usamos ese client_secret para inicializar Stripe Elements
+            elements = stripe.elements({ clientSecret });
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+
+            // 3. Mostramos el formulario de pago
+            paymentForm.style.display = 'block';
+            clientSecretForm.style.display = 'none';
+        });
+
+        // El resto del código para confirmar el pago es el mismo
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: window.location.href.split('?')[0] + '?status=completed',
+                },
+            });
+
+            if (error) {
+                messages.textContent = error.message;
+            } else {
+                messages.textContent = "Procesando pago...";
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('status') === 'completed') {
+            messages.style.color = 'green';
+            messages.textContent = '¡Pago completado con éxito!';
+        }
+    </script>
+</body>
+
+</html>
