@@ -14,6 +14,7 @@ import swaggerFile from './swagger-output.json' assert { type: 'json' };
 import cookieParser from 'cookie-parser'
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { startRentalCronJob } from './services/cronJob.services.js'
 
 dotenv.config()
 
@@ -58,3 +59,5 @@ app.get('/test-payment', (req, res) => {
 app.listen(PORT, () => {
   console.log('your server is running in port:', PORT)
 })
+
+startRentalCronJob()
