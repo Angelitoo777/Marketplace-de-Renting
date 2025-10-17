@@ -57,11 +57,10 @@
         <div id="messages" role="alert"></div>
     </form>
 
-    <script>
-        import dotenv from 'dotenv';
-        dotenv.config();
+    <script type="module">
 
-        const STRIPE_PUBLIC_KEY = '<%= process.env.STRIPE_PUBLIC_KEY %>';
+
+        const STRIPE_PUBLIC_KEY = 'pk_test_51SEtnFCxLd0pL7oKnk3rnjSu2hdPAR83ehpowjTMBvFxCIFxn1Tj5vS3eys6Chk7hKQzqV936ZmvqjFLaxa0EQvM00sVWheKpg'
 
         const stripe = Stripe(STRIPE_PUBLIC_KEY);
 

@@ -1,5 +1,6 @@
 import express from 'express'
 import { sequelize } from './databases/mysql.database.js'
+import { connectRabbitMQ } from './services/rabbitmq.services.js'
 import dotenv from 'dotenv'
 import { routesOfAuth } from './routes/auth.routes.js'
 import { routesOfAdmin } from './routes/admin.routes.js'
@@ -33,6 +34,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 try {
   await sequelize.sync({ force: false })
+  await connectRabbitMQ()
 } catch (error) {
   console.error(error)
 }
