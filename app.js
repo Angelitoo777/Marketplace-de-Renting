@@ -1,5 +1,6 @@
 import express from 'express'
 import { sequelize } from './databases/mysql.database.js'
+import { connectRabbitMQ } from './services/rabbitmq.services.js'
 import dotenv from 'dotenv'
 import { routesOfAuth } from './routes/auth.routes.js'
 import { routesOfAdmin } from './routes/admin.routes.js'
@@ -13,6 +14,7 @@ import swaggerFile from './swagger-output.json' assert { type: 'json' };
 import cookieParser from 'cookie-parser'
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { startRentalCronJob } from './services/cronJob.services.js'
 
 dotenv.config()
 
@@ -33,6 +35,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 try {
   await sequelize.sync({ force: false })
+  await connectRabbitMQ()
 } catch (error) {
   console.error(error)
 }
@@ -56,3 +59,5 @@ app.get('/test-payment', (req, res) => {
 app.listen(PORT, () => {
   console.log('your server is running in port:', PORT)
 })
+
+startRentalCronJob()

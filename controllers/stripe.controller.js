@@ -1,5 +1,5 @@
 import { stripe } from '../services/stripe.services.js'
-import { Rental } from '../models/associations.js'
+import { publishMessage } from '../services/rabbitmq.services.js'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -18,32 +18,31 @@ export class StripeController {
       return res.status(400).send(`Webhook Error: ${err.message}`)
     }
 
-    if (event.type === 'payment_intent.succeeded') {
-      try {
-        const paymentIntent = event.data.object
-        const rentalId = paymentIntent.metadata.rental_id
+    const paymentIntent = event.data.object
+    const rentalId = paymentIntent.metadata?.rental_id
 
-        await Rental.update(
-          { paymentStatus: 'paid' },
-          { where: { id: rentalId } }
-        )
-      } catch (error) {
-        console.error('Error actualizando renta:', error.message)
+    if (event.type === 'payment_intent.succeeded') {
+      if (!rentalId) {
+        console.log(' No se encontró rental_id en el metadata del PaymentIntent')
+        return res.status(400).json({ message: 'Metadata de pago inválida' })
       }
+      await publishMessage('rental_paid', {
+        rentalId,
+        payment_intent_id: paymentIntent.id
+      })
     }
 
     if (event.type === 'payment_intent.payment_failed') {
-      try {
-        const rentalId = event.data.object.metadata.rental_id
-        await Rental.update(
-          { paymentStatus: 'failed' },
-          { where: { id: rentalId } }
-        )
-      } catch (error) {
-        console.error('Error actualizando renta:', error.message)
+      if (!rentalId) {
+        console.log(' No se encontró rental_id en el metadata del PaymentIntent')
+        return res.status(400).json({ message: 'Metadata de pago inválida' })
       }
+      await publishMessage('rental_failed', {
+        rentalId,
+        payment_intent_id: paymentIntent.id
+      })
     }
 
-    return res.json({ received: true })
+    return res.status(200).json({ received: true })
   }
 }

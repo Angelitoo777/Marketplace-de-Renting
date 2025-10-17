@@ -120,7 +120,7 @@ export class RentalController {
 
       const totalPrice = parseFloat(findProduct.pricePerDay) * days
 
-      const rentalStatus = await RentalStatus.findOne({ where: { status: 'Pending' } })
+      const rentalStatus = await RentalStatus.findOne({ where: { status: 'pendiente' } })
 
       if (!rentalStatus) {
         return res.status(500).json({ message: 'Estado de renta "Pendiente" no configurado' })
