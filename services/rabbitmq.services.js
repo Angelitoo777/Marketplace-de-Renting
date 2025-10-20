@@ -50,3 +50,19 @@ export const publishMessage = async (eventType, eventData) => {
     throw new Error(error)
   }
 }
+
+export const publishEvent = async (eventType, eventData) => {
+  try {
+    const { channel } = await connectRabbitMQ()
+    const exchange = 'rentals_email_exchange'
+
+    await channel.assertExchange(exchange, 'topic', { durable: true })
+
+    channel.publish(exchange, eventType, Buffer.from(JSON.stringify(eventData)), { persistent: true })
+
+    console.log(`Evento publicado en RabbitMQ - Tipo: ${eventType}`, eventData)
+  } catch (error) {
+    console.error('Error publicando evento en RabbitMQ:', error.message)
+    throw new Error(error)
+  }
+}
