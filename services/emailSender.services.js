@@ -55,3 +55,43 @@ export const rentalFailedTemplate = (userName, productName) => {
     </div>
   `
 }
+
+export const rentalStartedTemplate = (userName, productName, startDate) => {
+  return `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin:auto; border:1px solid #eee; border-radius:8px; padding:20px;">
+      <h2 style="color:#2c7a7b;">¡Tu renta ha comenzado!</h2>
+      <p>Hola <strong>${userName}</strong>,</p>
+      <p>Te confirmamos que la renta del producto <strong>${productName}</strong> ha iniciado correctamente.</p>
+      <p><strong>Fecha de inicio:</strong> ${startDate}</p>
+      <p>Disfruta de tu producto durante el periodo contratado. Recuerda cuidarlo para evitar cargos adicionales.</p>
+      <hr>
+      <p style="font-size:14px; color:#555;">Gracias por confiar en <strong>Marketplace Renting</strong>.</p>
+    </div>
+  `
+}
+
+export const rentalEndedTemplate = (userName, productName, endDate) => {
+  return `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin:auto; border:1px solid #eee; border-radius:8px; padding:20px;">
+      <h2 style="color:#2b6cb0;">Tu renta ha finalizado</h2>
+      <p>Hola <strong>${userName}</strong>,</p>
+      <p>El periodo de renta del producto <strong>${productName}</strong> ha finalizado el día <strong>${endDate}</strong>.</p>
+      <p>Gracias por usar nuestro servicio. Esperamos verte pronto en otra renta.</p>
+      <hr>
+      <p style="font-size:14px; color:#555;">El equipo de <strong>Marketplace Renting</strong>.</p>
+    </div>
+  `
+}
+
+export const rentalCancelledTemplate = (userName, productName, startDate) => {
+  return `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin:auto; border:1px solid #eee; border-radius:8px; padding:20px;">
+      <h2 style="color:#c53030;">Renta cancelada automáticamente</h2>
+      <p>Hola <strong>${userName}</strong>,</p>
+      <p>La renta del producto <strong>${productName}</strong> programada para iniciar el <strong>${startDate}</strong> ha sido cancelada automáticamente debido a falta de pago.</p>
+      <p>Si deseas reprogramarla o realizar una nueva renta, puedes hacerlo desde tu cuenta.</p>
+      <hr>
+      <p style="font-size:14px; color:#555;">Gracias por elegir <strong>Marketplace Renting</strong>.</p>
+    </div>
+  `
+}
