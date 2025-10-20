@@ -8,15 +8,64 @@ Incluye autenticación, gestión de usuarios y productos, pagos con Stripe, mens
 ## 🧩 Arquitectura del Proyecto
 
 ```bash
-📦 src/
-├── controllers/        # Lógica de negocio
-├── services/           # Servicios (RabbitMQ, Stripe, Cron, Email)
-├── models/             # Modelos Sequelize
-├── routes/             # Endpoints API
-├── databases/          # Configuración MySQL y Redis
-├── middlewares/        # Validaciones, autenticación, etc.
-├── views/              # Plantillas EJS (testing, visualización)
-└── app.js              # Punto de entrada principal
+📦 BoneRent
+├── app.js                     # Punto de entrada principal del servidor Express
+├── package.json               # Dependencias y scripts del proyecto
+├── package-lock.json
+├── README.md
+├── swagger.js                 # Configuración para documentación automática con Swagger
+├── swagger-output.json        # Archivo generado de la documentación
+│
+├── 🧩 consumer/                # Consumers que escuchan eventos de RabbitMQ
+│   ├── emailPayment.consumer.js      # Maneja correos de confirmación de pago
+│   ├── emailRental.consumer.js       # Maneja correos automáticos de rentas (inicio, fin, cancelación)
+│   └── stripePayment.consumer.js     # Procesa eventos de pago provenientes de Stripe
+│
+├── 🧠 controllers/             # Lógica de negocio principal conectada a las rutas
+│   ├── admin.controller.js
+│   ├── auth.controller.js
+│   ├── products.controller.js
+│   ├── profile.controller.js
+│   ├── rental.controller.js
+│   └── stripe.controller.js
+│
+├── 🗄️ databases/               # Conexiones a bases de datos y servicios de caché
+│   ├── mysql.database.js       # Conexión y configuración con Sequelize (MySQL)
+│   └── redis.database.js       # Conexión a Redis para sesiones o cacheo
+│
+├── 🧱 middlewares/             # Middlewares reutilizables para validaciones y seguridad
+│   ├── auth.middleware.js          # Autenticación de usuarios por JWT o cookies
+│   ├── isOwner.middleware.js       # Verifica propiedad sobre productos o rentas
+│   ├── overlapRenting.middleware.js # Evita solapamiento de fechas en rentas
+│   └── roles.middleware.js         # Control de acceso por roles (admin, usuario)
+│
+├── 🧬 models/                  # Definición de entidades y sus relaciones
+│   ├── associations.js          # Relaciones entre modelos (User, Product, Rental, etc.)
+│   ├── products.model.js
+│   ├── rental.model.js
+│   └── user.model.js
+│
+├── 🧭 routes/                  # Rutas organizadas por dominio funcional
+│   ├── admin.routes.js
+│   ├── auth.routes.js
+│   ├── products.routes.js
+│   ├── profile.routes.js
+│   ├── rental.routes.js
+│   └── stripe.routes.js
+│
+├── ⚙️ services/                # Servicios externos y lógica auxiliar del negocio
+│   ├── cronJob.services.js        # Cron job para cambio automático de estados de rentas
+│   ├── emailSender.services.js    # Servicio de envío de correos HTML
+│   ├── rabbitmq.services.js       # Conexión y publicación de eventos en RabbitMQ
+│   └── stripe.services.js         # Integración con Stripe para pagos seguros
+│
+├── ✅ validations/             # Validaciones centralizadas para entidades y DTOs
+│   ├── products.validations.js
+│   ├── rental.validations.js
+│   └── user.validations.js
+│
+└── 🎨 views/                   # Vistas para testing o endpoints visuales (EJS)
+    └── test-payment.ejs         # Simulación de flujo de pago con Stripe
 ```
 
 ---
